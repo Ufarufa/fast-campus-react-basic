@@ -21,6 +21,8 @@ const initialState = {
   ],
 };
 
+const initialStateInputs = { username: "", email: "" };
+
 function reducer(state, action) {
   switch (action.type) {
     case "CREATE_USER":
@@ -50,10 +52,13 @@ const countActiveUsers = (users) => {
 };
 
 function App() {
+
+
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [from, onChange, reset] = useInputs({ username: "", email: "" });
+  const [form, onChange, reset] = useInputs(initialStateInputs);
   const { users } = state;
-  const { username, email } = from;
+
+  const { username, email } = form;
   const nextId = useRef(4);
 
   const onCreate = useCallback(() => {
