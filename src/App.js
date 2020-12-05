@@ -1,7 +1,33 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo, useCallback } from "react";
 import CreateUser from "./CreateUser";
 import Hello from "./Hello";
 import UserList from "./UserList";
+
+const initialState = {
+  inputs: {
+    username: "",
+    email: "",
+  },
+  users: [
+    {
+      id: 1,
+      username: "tester",
+      email: "tester.com",
+      active: true,
+    },
+    {
+      id: 2,
+      username: "lee",
+      email: "lee.com",
+      active: false,
+    },
+  ],
+};
+
+const countActiveUsers = (users) => {
+  console.log("countActiveUsers");
+  return users.filter((user) => user.active).length;
+};
 
 function App() {
   const [inputs, setInputs] = useState({
@@ -27,48 +53,58 @@ function App() {
   const nextId = useRef(5);
 
   const { username, email } = inputs;
-  const onChange = (e) => {
-    const { name, value } = e.target;
-    setInputs({
-      ...inputs,
-      [name]: value,
-    });
-  };
 
-  const onCreate = (e) => {
-    setInputs({
-      username: "",
-      email: "",
-    });
+  const onChange = useCallback(
+    (e) => {
+      const { name, value } = e.target;
+      setInputs({
+        ...inputs,
+        [name]: value,
+      });
+    },
+    [inputs]
+  );
 
-    const user = {
-      id: nextId.current,
-      username,
-      email,
-    };
+  const onCreate = useCallback(
+    (e) => {
+      setInputs({
+        username: "",
+        email: "",
+      });
 
-    setUsers([...users, user]);
+      const user = {
+        id: nextId.current,
+        username,
+        email,
+      };
 
-    nextId.current += 1;
-  };
+      setUsers((users) => [...users, user]);
 
-  const onRemove = (id) => {
-    setUsers(
+      nextId.current += 1;
+    },
+    [username, email]
+  );
+
+  const onRemove = useCallback((id) => {
+    setUsers((users) =>
       users.filter((user) => {
         return user.id !== id;
       })
     );
-  };
+  }, []);
 
-  const onToggle = (id) => {
-    setUsers(
-      users.map((user) => {
-        if (user.id === id) user.active = !user.active;
+  const onToggle = useCallback((id) => {
+    setUsers((users) => {
+      return users.map((user) => {
+        return {
+          ...user,
+          active: user.id === id ? !user.active : user.active,
+        };
+      });
+    });
+  }, []);
 
-        return user;
-      })
-    );
-  };
+  const usersActiveCount = useMemo(() => countActiveUsers(users), [users]);
 
   return (
     <>
@@ -83,6 +119,7 @@ function App() {
         onRemove={onRemove}
         onToggle={onToggle}
       ></UserList>
+      <div>{usersActiveCount}</div>
     </>
   );
 }
