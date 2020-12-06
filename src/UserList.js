@@ -1,14 +1,21 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
+import { UserDipspatch } from ".App";
 
 const test = (f) => f;
 
-const User = React.memo(function User({ user, onToggle, onRemove }) {
+const User = React.memo(function User({ user }) {
   console.log("User");
+  const dispatch = useContext(UserDipspatch);
 
   return (
     <p>
       <b
-        onClick={() => onToggle(user.id)}
+        onClick={() =>
+          dispatch({
+            type: "TOGGLE_USER",
+            id: user.id,
+          })
+        }
         style={{
           color: user.active ? "green" : "black",
           cursor: "pointer",
@@ -17,12 +24,21 @@ const User = React.memo(function User({ user, onToggle, onRemove }) {
         {user.username} :{" "}
       </b>
       <span>{user.email}</span>
-      <button onClick={() => onRemove(user.id)}>삭제</button>
+      <button
+        onClick={() =>
+          dispatch({
+            type: "REMOVE_USER",
+            id: user.id,
+          })
+        }
+      >
+        삭제
+      </button>
     </p>
   );
 });
 
-function UserList({ users, onRemove, onToggle }) {
+function UserList({ users }) {
   useEffect(() => {
     console.log("컴퍼넌트가 화면에 나타남 ");
   }, []);
@@ -30,14 +46,7 @@ function UserList({ users, onRemove, onToggle }) {
   return (
     <div>
       {users.map((user) => {
-        return (
-          <User
-            key={user.id}
-            user={user}
-            onRemove={onRemove}
-            onToggle={onToggle}
-          />
-        );
+        return <User key={user.id} user={user} />;
       })}
     </div>
   );
