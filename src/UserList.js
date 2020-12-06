@@ -1,5 +1,5 @@
 import React, { useEffect, useContext } from "react";
-import { UserDipspatch } from ".App";
+import { UserDipspatch } from "./App";
 
 const test = (f) => f;
 
